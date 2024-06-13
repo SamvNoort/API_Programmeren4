@@ -7,7 +7,7 @@ const db = require('../dao/mysql-db')
 const logger = require('../util/logger')
 const jwtSecretKey = require('../util/config').secretkey
 
-const authController = {
+const authService = {
     login: (userCredentials, callback) => {
         logger.debug('login')
 
@@ -147,14 +147,62 @@ const authController = {
                                     message:
                                         'User not found or password invalid',
                                     data: {}
-                                })
+                                });
                             }
                         }
                     }
                 )
             }
-        })
+        });
+    },
+    register: (data, callback) => {
+        logger.debug('register');
+
+        db.getConnection((err, connection) => {
+            if(err) {
+                logger.error(err)
+                callback(err.message, null);
+            }
+            if(connection) {
+                connection.query(
+                    'INSERT INTO `user` (`emailAdress`, `password`, `firstName`, `lastName`, `street`, `city`, `phoneNumber`) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                    [
+                        data.emailAdress,
+                        data.password,
+                        data.firstName,
+                        data.lastName,
+                        data.street,
+                        data.city,
+                        data.phoneNumber
+                    ],
+                    (err, rows, fields) => {
+                        if(err) {
+                            logger.error('Error: ' + err.toString())
+                            connection.release();
+                        } else {
+                            connection.query(
+                                'SELECT `id` FROM `user` WHERE `emailAdress` = ?', 
+                                [data.emailAdress],
+                                (err, rows) => {
+                                    if(err) {
+                                        logger.error('Error: ' + err);
+                                        callback(err.message, null);
+                                    } else {
+                                        logger.trace('User registrated');
+                                        callback(null, {
+                                            status: 201,
+                                            message: 'User registrated',
+                                            data: rows[0]
+                                        });
+                                    }
+                                }
+                            )
+                        }
+                    }
+                )
+            }
+        });
     }
 }
 
-module.exports = authController
+module.exports = authService
