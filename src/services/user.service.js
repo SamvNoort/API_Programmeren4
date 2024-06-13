@@ -95,6 +95,48 @@ const userService = {
                 }
             )
         })
+    },
+
+    getById: (userId, callback) => {
+        logger.info('getById userId: ' + userId);
+
+        db.getConnection(function (err, connection) {
+            if(err) {
+                logger.error(err);
+                callback(err, null);
+                return;
+            }
+
+            connection.query(
+                'SELECT `emailAdress`, `phoneNumber`, `meal`.name AS mealName ' + 
+                'FROM `user` ' + 
+                'INNER JOIN `meal` ON `user`.`id` = `meal`.`id` ' + 
+                'WHERE `user`.`id` = ?',
+                [userId],
+                function(error, results) {
+                    connection.release()
+
+                    if (error) {
+                        logger.error(error)
+                        callback(error, null)
+                    } else if(results.length === 0){
+                        logger.info(`User with id ${userId} not found`);
+                        callback(null, {
+                            status: 404,
+                            message: 'User not found',
+                            data: {}
+                        });
+                    } else {
+                        logger.debug(results);
+                        callback(null, {
+                            status: 200,
+                            message: `Found ${results.length} user${results.length !== 1 ? 'S' : ''}.`,
+                            data: results
+                        });
+                    }
+                }
+            )
+        });
     }
 }
 
