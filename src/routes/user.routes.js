@@ -42,6 +42,7 @@ router.post('/api/user', validateUserCreate, userController.create)
 router.get('/api/user', validateToken,userController.getAll)
 router.get('/api/user/profile', validateToken, userController.getProfile)
 router.get('/api/user/:userId', userController.getById)
+router.post('/api/user/filter', validateToken, userController.filter)
 
 // Tijdelijke routes om niet bestaande routes op te vangen
 router.put('/api/user/:userId', notFound)
