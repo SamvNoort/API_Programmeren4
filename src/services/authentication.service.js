@@ -157,49 +157,74 @@ const authService = {
     },
     register: (data, callback) => {
         logger.debug('register');
-
+     
         db.getConnection((err, connection) => {
-            if(err) {
-                logger.error(err)
+            if (err) {
+                logger.error(err);
                 callback(err.message, null);
             }
-            if(connection) {
+            if (connection) {
+                // First, check if the email already exists
                 connection.query(
-                    'INSERT INTO `user` (`emailAdress`, `password`, `firstName`, `lastName`, `street`, `city`, `phoneNumber`) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                    [
-                        data.emailAdress,
-                        data.password,
-                        data.firstName,
-                        data.lastName,
-                        data.street,
-                        data.city,
-                        data.phoneNumber
-                    ],
-                    (err, rows, fields) => {
-                        if(err) {
-                            logger.error('Error: ' + err.toString())
+                    'SELECT `id` FROM `user` WHERE `emailAdress` = ?',
+                    [data.emailAdress],
+                    (err, results) => {
+                        if (err) {
                             connection.release();
+                            logger.error('Error: ', err.toString());
+                            callback(err.message, null);
+                        } else if (results.length > 0) {
+                            // Email already exists, return 400
+                            connection.release();
+                            logger.warn('Email already in use');
+                            callback(null, {
+                                status: 400,
+                                message: 'Email already in use',
+                                data: {}
+                            })
                         } else {
+                            // Email does not exist, proceed to insert new user
                             connection.query(
-                                'SELECT `id` FROM `user` WHERE `emailAdress` = ?', 
-                                [data.emailAdress],
-                                (err, rows) => {
-                                    if(err) {
-                                        logger.error('Error: ' + err);
+                                'INSERT INTO `user` (`emailAdress`, `password`, `firstName`, `lastName`, `phoneNumber`, `street`, `city`) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                                [
+                                    data.emailAdress,
+                                    data.password,
+                                    data.firstName,
+                                    data.lastName,
+                                    data.phoneNumber,
+                                    data.street,
+                                    data.city
+                                ],
+                                (err, result) => {
+                                    if (err) {
+                                        connection.release();
+                                        logger.error('Error: ', err.toString());
                                         callback(err.message, null);
                                     } else {
-                                        logger.trace('User registrated');
-                                        callback(null, {
-                                            status: 201,
-                                            message: 'User registrated',
-                                            data: rows[0]
-                                        });
+                                        connection.query(
+                                            'SELECT `id`, `emailAdress`, `firstName`, `lastName`, `phoneNumber`, `street`, `city` FROM `user` WHERE `emailAdress` = ?',
+                                            [data.emailAdress],
+                                            (err, rows) => {
+                                                connection.release();
+                                                if (err) {
+                                                    logger.error('Error: ', err.toString());
+                                                    callback(err.message, null);
+                                                } else {
+                                                    logger.trace('User registered');
+                                                    callback(null, {
+                                                        status: 201,
+                                                        message: 'User registered',
+                                                        data: rows[0]
+                                                    });
+                                                }
+                                            }
+                                        )
                                     }
                                 }
                             )
                         }
                     }
-                )
+                );
             }
         });
     }
