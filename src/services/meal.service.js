@@ -1,5 +1,7 @@
-const pool = require('../dao/mysql-db')
-const logger = require('../util/logger')
+const pool = require('../dao/mysql-db');
+const logger = require('../util/logger');
+
+const db = require('../dao/mysql-db');
  
 const mealService = {
     create: (meal, callback) => {
@@ -29,6 +31,36 @@ const mealService = {
                     data: { id: result.insertId, ...meal }
                 })
             }
+        })
+    },
+
+    getAll: (callback) => {
+        logger.info('getAll')
+
+        db.getConnection(function (err, connection) {
+            if (err) {
+                logger.error(err)
+                callback(err, null)
+                return
+            }
+
+            connection.query(
+                'SELECT * FROM `meal`',
+                function (error, results, fields) {
+                    connection.release()
+
+                    if (error) {
+                        logger.error(error)
+                        callback(error, null)
+                    } else {
+                        logger.debug(results)
+                        callback(null, {
+                            message: `Found ${results.length} meals.`,
+                            data: results
+                        })
+                    }
+                }
+            )
         })
     }
 }
