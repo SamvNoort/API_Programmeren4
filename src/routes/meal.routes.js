@@ -45,5 +45,6 @@ const validateMealCreate = (req, res, next) => {
 router.post('/api/meal/create', validateToken, validateMealCreate, mealController.create)
 //router.put('/api/meal/update', validateToken, validateMealCreate, mealController.update)
 router.get('/api/meal', mealController.getAll)
+router.get('/api/meal/:mealId', mealController.getMealById)
  
 module.exports = router
