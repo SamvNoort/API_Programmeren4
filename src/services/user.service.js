@@ -134,13 +134,42 @@ const userService = {
                             data: results
                         });
                     }
-                }
-            )
+                });
         });
     },
 
     filter: (filter, callback) => {
-        logger.info('filter', filter)
+        logger.info('filter', filter);
+ 
+        db.getConnection(function (err, connection) {
+            if (err) {
+                logger.error(err);
+                callback(err, null);
+                return
+            }
+ 
+            connection.query(
+                'SELECT id, firstName, lastName FROM `user` WHERE city LIKE ? AND isActive = ?',
+                ['%' + filter.city + '%', filter.isActive],
+                function (error, results, fields) {
+                    connection.release();
+ 
+                    if (error) {
+                        logger.error(error);
+                        callback(error, null);
+                    } else {
+                        logger.debug(results);
+                        callback(null, {
+                            message: `Found ${results.length} users.`,
+                            data: results
+                        });
+                    }
+                });
+        });
+    },
+
+    update: (userId, user, callback) => {
+        logger.info('update user', userId, user)
  
         db.getConnection(function (err, connection) {
             if (err) {
@@ -150,18 +179,36 @@ const userService = {
             }
  
             connection.query(
-                'SELECT id, firstName, lastName FROM `user` WHERE city LIKE ? AND isActive = ?',
-                ['%' + filter.city + '%', filter.isActive],
-                function (error, results, fields) {
+                'UPDATE `user` SET `firstName` = ?, `lastName` = ?, `emailAdress` = ?, `phoneNumber` = ?, `street` = ?, `city` = ? WHERE `id` = ?',
+                [
+                    user.firstName,
+                    user.lastName,
+                    user.emailAdress,
+                    user.phoneNumber,
+                    user.street,
+                    user.city,
+                    userId
+                ],
+                function (error, results) {
                     connection.release()
  
                     if (error) {
                         logger.error(error)
                         callback(error, null)
+                    } else if (results.affectedRows === 0) {
+                        // No user found, return 404
+                        logger.info(`User with ID ${userId} not found`)
+                        callback(null, {
+                            status: 404,
+                            message: 'User not found',
+                            data: {}
+                        })
                     } else {
+                        // User updated, return user details
                         logger.debug(results)
                         callback(null, {
-                            message: `Found ${results.length} users.`,
+                            status: 200,
+                            message: `User with ID ${userId} updated.`,
                             data: results
                         })
                     }
