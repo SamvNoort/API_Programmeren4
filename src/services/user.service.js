@@ -215,6 +215,47 @@ const userService = {
                 }
             )
         })
+    },
+
+    delete: (userId, callback) => {
+        logger.info('delete user', userId);
+ 
+        db.getConnection(function (err, connection) {
+            if (err) {
+                logger.error(err);
+                callback(err, null);
+                return
+            }
+ 
+            connection.query(
+                'Update `user` SET isActive = 0 WHERE `id` = ?',
+                [userId],
+                function (error, results) {
+                    connection.release()
+ 
+                    if (error) {
+                        logger.error(error)
+                        callback(error, null)
+                    } else if (results.affectedRows === 0) {
+                        // No user found, return 404
+                        logger.info(`User with ID ${userId} not found`)
+                        callback(null, {
+                            status: 404,
+                            message: 'User not found',
+                            data: {}
+                        })
+                    } else {
+                        // User deleted, return success message
+                        logger.debug(results)
+                        callback(null, {
+                            status: 200,
+                            message: `Gebruiker met id ${userId} inactief gezet`,
+                            data: results
+                        });
+                    }
+                }
+            )
+        })
     }
 }
 

@@ -78,9 +78,10 @@ router.get('/api/user/profile', validateToken, userController.getProfile)
 router.get('/api/user/:userId', userController.getById)
 router.post('/api/user/filter', validateToken, userController.filter)
 router.put('/api/user/update', validateToken, validateUpdateUser, userController.update)
+router.delete('/api/user/delete', validateToken, userController.delete)
 
 // Tijdelijke routes om niet bestaande routes op te vangen
-router.put('/api/user/:userId', notFound)
-router.delete('/api/user/:userId', notFound)
+// router.put('/api/user/:userId', notFound)
+// router.delete('/api/user/:userId', notFound)
 
 module.exports = router
