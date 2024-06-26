@@ -18,13 +18,29 @@ const notFound = (req, res, next) => {
 
 const validateUserCreate = (req, res, next) => {
     try {
-        assert(req.body.firstName, 'Missing or incorrect firstName field');
-        chai.expect(req.body.firstName).to.not.be.empty;
-        chai.expect(req.body.firstName).to.be.a('string');
-        chai.expect(req.body.firstName).to.match(
-            /^[a-zA-Z]+$/,
-            'firstName must be a string'
+        const body = req.body;
+        assert(body.firstName, 'Missing or incorrect firstName field');
+        assert(body.lastName, 'Missing or incorrect lastName field');
+        assert(body.emailAdress, 'Missing or incorrect emailAdress field');
+        assert(body.city, 'Missing or incorrect city field');
+        assert(body.street, 'Missing or incorrect street field');
+        assert(body.password, 'Missing or incorrect password field');
+
+        chai.expect(body.firstName).to.not.be.empty;
+        chai.expect(body.firstName).to.be.a('string');
+        chai.expect(body.lastName).to.not.be.empty;
+        chai.expect(body.lastName).to.be.a('string');
+        chai.expect(body.street).to.not.be.empty;
+        chai.expect(body.street).to.be.a('string');
+        chai.expect(body.city).to.not.be.empty;
+        chai.expect(body.city).to.be.a('string');
+        chai.expect(req.body.emailAdress).to.be.a('string');
+        chai.expect(body.emailAdress, 'Invalid emailAdress').to.match(
+            /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
         );
+        assert(req.body.firstName, 'Missing or incorrect password field');
+        chai.expect(req.body.password).to.not.be.empty;
+        chai.expect(req.body.password).to.be.a('string');
         logger.trace('User successfully validated');
         next();
     } catch (ex) {
