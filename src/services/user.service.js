@@ -1,12 +1,24 @@
 const database = require('../dao/inmem-db')
 const logger = require('../util/logger')
+const pool = require('../dao/mysql-db');
 
 const db = require('../dao/mysql-db')
 
 const userService = {
     create: (user, callback) => {
-        logger.info('create user', user)
-        database.add(user, (err, data) => {
+        logger.info('create user ', user)
+        const query =
+            'INSERT INTO `user` (firstName, lastName, emailAdress, password, city, street) VALUES (?, ?, ?, ?, ?, ?)'
+        const params = [
+            user.firstName,
+            user.lastName,
+            user.emailAdress,
+            user.password,
+            user.city,
+            user.street
+        ]
+ 
+        pool.query(query, params, (err, result) => {
             if (err) {
                 logger.info(
                     'error creating user: ',
@@ -14,10 +26,10 @@ const userService = {
                 )
                 callback(err, null)
             } else {
-                logger.trace(`User created with id ${data.id}.`)
+                logger.trace(`user created with id ${result.insertId}.`)
                 callback(null, {
-                    message: `User created with id ${data.id}.`,
-                    data: data
+                    message: `user created with id ${result.insertId}.`,
+                    data: { id: result.insertId, ...user }
                 })
             }
         })
