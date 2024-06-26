@@ -142,7 +142,7 @@ describe('UC201 Registreren als nieuwe user', () => {
             .send({
                 firstName: 'Voornaam',
                 lastName: 'Achternaam',
-                emailAdress: 'joe@server.nl',
+                emailAdress: 'joe2test@server.nl',
                 password: 'secret',
                 city: 'Breda',
                 street:'ridderstraat'
