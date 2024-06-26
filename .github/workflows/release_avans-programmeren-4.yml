@@ -63,12 +63,12 @@ jobs:
                   sudo /etc/init.d/mysql start
                   sudo apt-get install -y mysql-client
                   mysql -h 127.0.0.1 -uroot -p${{ env.MYSQL_ROOT_PASSWORD }} -e "SHOW DATABASES;"
-                  mysql -h 127.0.0.1 -uroot -p${{ env.MYSQL_ROOT_PASSWORD }} -e "CREATE DATABASE ${{env.DB_DATABASE}};"
+                  mysql -h 127.0.0.1 -uroot -p${{ env.MYSQL_ROOT_PASSWORD }} -e "CREATE DATABASE ${{ env.DB_DATABASE }};"
 
             - name: Import the database
               run: |
-                  mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} ${{env.DB_DATABASE}} < share-a-meal.sql
-                  mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} ${{env.DB_DATABASE}} -e "SHOW TABLES;"
+                  mysql -uroot -p${{ env.MYSQL_ROOT_PASSWORD }} ${{ env.DB_DATABASE }} < share-a-meal.sql
+                  mysql -uroot -p${{ env.MYSQL_ROOT_PASSWORD }} ${{ env.DB_DATABASE }} -e "SHOW TABLES;"
 
             - name: npm test
               run: |
@@ -81,7 +81,7 @@ jobs:
             name: 'Production'
             url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
         permissions:
-            id-token: write #This is required for requesting the JWT
+            id-token: write # This is required for requesting the JWT
 
         steps:
             - name: Download artifact from build job
@@ -97,6 +97,7 @@ jobs:
               with:
                   client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F1BBE1C6E15343998BFC3645A680ED2B }}
                   tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_3E4B3675A0364996820873E3FA4F60EE }}
+                  client-secret: ${{ secrets.AZUREAPPSERVICE_CLIENTSECRET }}
                   subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_F3DEA5E24B3342A78C09701C708835A9 }}
 
             - name: 'Deploy to Azure Web App'
