@@ -118,7 +118,7 @@ describe('UC201 Registreren als nieuwe user', () => {
             .send({
                 firstName: 'Voornaam',
                 lastName: 'Achternaam',
-                emailAdress: 'v.a@server.nl',
+                emailAdress: 'h.huizinga@server.nl',
                 password: 'secret',
                 city: 'Breda',
                 street:'ridderstraat'
@@ -128,7 +128,7 @@ describe('UC201 Registreren als nieuwe user', () => {
                 chai.expect(res).not.to.have.status(200);
                 chai.expect(res.body).to.be.a('object');
                 chai.expect(res.body).to.have.property('status').equals(500);
-                res.body.should.have.property('message').that.is.a('string').equals(`Duplicate entry 'v.a@server.nl' for key 'IDX_87877a938268391a71723b303c'`)
+                res.body.should.have.property('message').that.is.a('string').equals(`Duplicate entry 'h.huizinga@server.nl' for key 'IDX_87877a938268391a71723b303c'`)
                 
                 
 
