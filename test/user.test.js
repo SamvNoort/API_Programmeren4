@@ -37,6 +37,8 @@ const INSERT_MEALS =
     "(1, 'Meal A', 'description', 'image url', NOW(), 5, 6.50, 1)," +
     "(2, 'Meal B', 'description', 'image url', NOW(), 5, 6.50, 1);"
 
+let token = ''
+
 describe('UC201 Registreren als nieuwe user', () => {
 
     beforeEach((done) => {
@@ -213,6 +215,41 @@ describe('UC201 Registreren als nieuwe user', () => {
                 data.should.have.property('emailAdress')
                 data.should.have.property('id').that.is.a('number')
 
+                done()
+            })
+    })
+})
+
+describe('UC-202 opvragen van overzicht users', () => {
+
+    const endpointToTest = '/api/user'
+    let agent
+
+    beforeEach((done) => {
+        console.log('before each test')
+        agent = chai.request.agent(server)
+        // Simulate login
+        agent
+            .post('/api/auth/login')
+            .send({
+                emailAdress: 'name@server.nl',
+                password: 'secret'
+            })
+            .end((err, res) => {
+                res.should.have.status(200)
+                token = res.body.data.token
+                done()
+            })
+    })
+
+    it('TC-202-1 Opvragen van alle users', (done) => {
+        agent
+            .get(endpointToTest)
+            .set('Authorization', `Bearer ${token}`) // Set the Authorization header
+            .end((err, res) => {
+                chai.expect(res).to.have.status(200)
+                chai.expect(res).not.to.have.status(400)
+ 
                 done()
             })
     })
