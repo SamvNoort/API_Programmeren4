@@ -85,7 +85,7 @@ describe('UC101 Login', () => {
         chai.request(server)
             .post(endpointToTest)
             .send({
-                emailAdress: 'name@server.nl',
+                emailAdress: 'm.vandullemen@server.nl',
                 password: 'secret'
             })
             .end((err, res) => {
