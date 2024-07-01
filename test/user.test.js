@@ -254,3 +254,37 @@ describe('UC-202 opvragen van overzicht users', () => {
             })
     })
 })
+
+describe('UC203 Opvragen van een gebruikersprofiel', () => {
+    const endpointToTest = '/api/user/profile'
+    let agent
+ 
+    beforeEach((done) => {
+        agent = chai.request.agent(server)
+        // Simulate login
+        agent
+            .post('/api/auth/login')
+            .send({
+                emailAdress: 'name@server.nl',
+                password: 'secret'
+            })
+            .end((err, res) => {
+                res.should.have.status(200)
+                token = res.body.data.token
+                done()
+            })
+    })
+
+    it('TC-203-1 Opvragen van een gebruikersprofiel', (done) => {
+        agent
+            .get(endpointToTest)
+            .set('Authorization', `Bearer ${token}`) // Set the Authorization header
+            .end((err, res) => {
+                chai.expect(res).to.have.status(200)
+                chai.expect(res).not.to.have.status(400)
+                chai.expect(res.body).to.be.a('object')
+                done()
+            })
+    })
+
+})
