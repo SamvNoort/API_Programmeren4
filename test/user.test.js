@@ -286,5 +286,37 @@ describe('UC203 Opvragen van een gebruikersprofiel', () => {
                 done()
             })
     })
+})
 
+describe('UC205-Verwijderen van een gebruiker', () => {
+    const endpointToTest = '/api/user/delete'
+    let agent
+ 
+    beforeEach((done) => {
+        agent = chai.request.agent(server)
+        // Simulate login
+        agent
+            .post('/api/auth/login')
+            .send({
+                emailAdress: 'name@server.nl',
+                password: 'secret'
+            })
+            .end((err, res) => {
+                res.should.have.status(200)
+                token = res.body.data.token
+                done()
+            })
+    })
+    it('TC-205-1 Verwijderen van een gebruiker', (done) => {
+        agent
+            .delete(endpointToTest)
+            .set('Authorization', `Bearer ${token}`)
+            .send() // Set the Authorization header
+            .end((err, res) => {
+                chai.expect(res).to.have.status(200)
+                chai.expect(res).not.to.have.status(400)
+                chai.expect(res.body).to.be.a('object')
+                done()
+            })
+    })
 })
