@@ -100,9 +100,8 @@ describe('UC201 Registreren als nieuwe user', () => {
                     .expect(res.body)
                     .to.have.property('data')
                     .that.is.a('object').that.is.empty
-
-                done()
             })
+        done()
     })
 
     it('TC-201-2 Niet-valide email adres', (done) => {
