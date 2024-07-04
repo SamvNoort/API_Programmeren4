@@ -288,7 +288,27 @@ describe('UC203 Opvragen van een gebruikersprofiel', () => {
     })
 })
 
-describe('UC205-Verwijderen van een gebruiker', () => {
+describe('UC204 opvragen van usergegevens met ID', () => {
+    const endpointToTest = '/api/user/1'
+
+    beforeEach((done) => {
+        logger.debug('beforeEach called')
+        done()
+    })
+
+    it('TC-204-1 Opvragen van gebruikergegevens via id', (done) => {
+        chai.request(server)
+            .get(endpointToTest)
+            .end((err, res) => {
+                chai.expect(res).to.have.status(200)
+                chai.expect(res).not.to.have.status(404)
+                chai.expect(res.body).to.be.a('object')
+                done()
+            })
+    })
+})
+
+describe('UC205 Verwijderen van een gebruiker', () => {
     const endpointToTest = '/api/user/delete'
     let agent
  
